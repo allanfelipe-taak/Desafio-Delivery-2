@@ -13,4 +13,10 @@ public abstract class EntidadeBase {
         }
         return false;
     }
+
+    public Integer hashCode() {
+    // Requisito: Baseado exclusivamente na identidade (ID)
+    return System.hashCode(this.id);
+}
+
 }
