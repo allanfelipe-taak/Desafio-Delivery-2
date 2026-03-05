@@ -1,4 +1,5 @@
-Arquitetura de Domínio 
+🚀 Arquitetura de Domínio 
+
 Este projeto demonstra a evolução de um sistema de delivery simples para uma arquitetura robusta baseada em Domain-Driven Design (DDD) e Design Patterns avançados em Apex (Salesforce).
 
 Etapa 1: Modelagem Rica (EntidadeBase).
@@ -12,93 +13,54 @@ Etapa 4: Domain Service (ProcessadorPedido e Frete).
 Etapa 5: State Pattern (Ciclo de vida sem Enums).
 
 Etapas da Arquitetura
-Etapa 1: Modelagem Rica (Domain-Driven Design)
-Substituímos o uso de tipos primitivos por uma modelagem que protege a integridade dos dados desde o nascimento do objeto:
 
-EntidadeBase: Classe abstrata que garante uma identidade única (UUID) imutável para todas as entidades.
+✅  Etapa 1: O Coração do Domínio (DDD e Value Objects)Arquivos: EntidadeBase.cls, Dinheiro.cls, EntidadeBase.cls.  
 
-Value Objects (VOs): Criação de Dinheiro, Documento e Endereco. São objetos imutáveis que se autovalidam, impedindo valores negativos ou CPFs inválidos.
+Conceito DDD: Introdução de Value Objects (Objetos de Valor). O Dinheiro não é apenas um número; ele é um objeto que garante que o valor nunca seja negativo.SOLID (S - Single Responsibility): A classe Dinheiro tem apenas uma responsabilidade: cuidar da lógica matemática monetária.
 
-Pessoa e Cliente: Reestruturação hierárquica onde o Cliente herda comportamentos de Pessoa, utilizando os novos VOs.
+Conceito Aplicado: Identidade (na base) e Value Object (no Dinheiro).
 
-Etapa 2: Pedido como Aggregate Root
-O Pedido passou a ser o "Cofre" do sistema, controlando todas as suas partes internas:
+✅ Etapa 2: Integridade e Agregados (DDD)Arquivos: Pedido.cls, ItemPedido.cls. 
 
-Encapsulamento Total: ItemPedido não pode ser manipulado fora do contexto do Pedido.
+Conceito DDD: Aggregate Root (Raiz de Agregado). O Pedido é o "chefe" do grupo. Você não pode alterar um ItemPedido sem passar pelo Pedido.SOLID (Encapsulamento): Protegemos a lista de itens e o total, garantindo que ninguém de fora quebre as regras de cálculo do pedido.
 
-Proteção de Invariantes: Regras que impedem quantidades nulas, itens duplicados ou confirmação de pedidos vazios.
+Conceito Aplicado: Aggregate Root (O Pedido controla os Itens).
 
-Total Derivado: O valor total é uma consequência dos itens e não pode ser alterado manualmente.
+✅  Etapa 3: Flexibilidade de Regras (Strategy Pattern)Arquivos: PoliticaDePreco.cls, PoliticaPrecoPadrao.cls, PoliticaPrecoComDescontoPercentual.cls.
 
- Etapa 3: Polimorfismo de Preço (Strategy Pattern)
-Eliminamos os ifs de desconto, tornando o sistema aberto para novas regras de negócio sem alteração de código core:
+Conceito: Design Pattern: Strategy Pattern. Criamos uma "estratégia" para calcular o preço.SOLID (O - Open/Closed): O sistema está Aberto para novos descontos, mas Fechado para modificação no Produto.cls. Você adiciona regras sem mexer no que já funciona.
 
-Interface PoliticaDePreco: Define a abstração para qualquer cálculo de valor.
-
-Estratégias Concretas: Implementação de PoliticaPrecoPadrao, PoliticaPrecoDesconto e PromocionalPorHorario.
-
-Composição: O Produto delega o cálculo para a política injetada, respeitando o Open/Closed Principle.
-
-Etapa 4: Serviço de Domínio (Domain Service)
-Separamos o "quem eu sou" (Entidade) do "o que eu faço" (Processo):
-
-ProcessadorPedido: Um maestro que orquestra ações complexas como confirmações e cancelamentos.
-
-Política de Frete: Introdução da interface PoliticaDeFrete, permitindo que o frete seja calculado de forma independente (Fixo, Grátis ou Percentual).
-
-Fluxo Controlado: O serviço garante que o pedido só avance se todas as regras de negócio forem satisfeitas.
-
- Etapa 5: Ciclo de Vida Inteligente (State Pattern)
-Removemos completamente os Enums e lógicas condicionais de status, substituindo por comportamento polimórfico:
-
-Hierarquia de Estados: O Pedido delega suas ações para classes como EstadoCarrinho, EstadoEmProcessamento e EstadoEntregue.
-
-Blindagem de Transição: Tentativas de alterar um pedido após a confirmação disparam exceções automáticas baseadas no estado atual.
-
-Fim da Lógica Condicional: O Pedido não pergunta mais "em qual status estou", ele apenas executa a ação e o estado atual responde.
+Conceito Aplicado: Strategy Pattern (Flexibilidade de preços).
 
 
+✅ Etapa 4: Orquestração de Processos (Domain Service)Arquivos: ProcessadorPedido.cls, PoliticaDeFrete.cls, FreteFixo.cls, BusinessException.cls.
+
+Conceito DDD: Domain Service. O ProcessadorPedido não é um objeto físico, é um serviço que orquestra o frete e a confirmação.SOLID (D - Dependency Inversion): O processador depende da interface PoliticaDeFrete, e não de uma classe específica. Isso permite trocar o tipo de frete facilmente.
+
+Conceito Aplicado: Domain Service (Orquestração de frete).
 
 
- Diferenciais Arquiteturais (SOLID & DDD)
-Diferente de sistemas básicos, o DelivFast 2 foi construído com foco em segurança de estado e extensibilidade:
+ ✅ Etapa 5: Ciclo de Vida Inteligente (State Pattern)Arquivos: EstadoPedido.cls, EstadoCarrinho.cls, EstadoEmProcessamento.cls, EstadoEntregue.cls, EstadoCancelado.cls.
+ 
+ Conceito? Design Pattern: State Pattern. O comportamento do o Pedido não sabe quais são as regras de transição. Ele apenas pergunta ao objeto estadoAtual se a ação é permitida. Isso é o Desacoplamento em sua forma mais pura. Agora depende do estado.SOLID (L - Liskov Substitution): Qualquer classe de estado (ex: EstadoEntregue) pode substituir a classe pai (EstadoPedido) sem quebrar o sistema.SOLID (I - Interface Segregation): Cada estado implementa apenas o que lhe é permitido, lançando exceções para o que é proibido.
 
-1. Modelagem Rica com Value Objects (VOs)
-Substituímos tipos primitivos (String, Double) por objetos que possuem regras de negócio próprias e são imutáveis:
+ Conceito Aplicado: State Pattern (Ciclo de vida inteligente). 
+ 
+ 
+ Resumo para apresentação:ConceitoOnde encontrar no seu projeto?DDDNo uso de Aggregate Root (Pedido) e Value Objects (Dinheiro).SOLIDNo uso de interfaces e na separação total de responsabilidades por arquivo.Design PatternsNo Strategy (Fretes/Preços) e no State (Ciclo de vida do Pedido).Clean CodeNo uso da BusinessException para tratar erros de forma elegante.
 
-Dinheiro: Garante que valores monetários nunca sejam negativos e centraliza cálculos financeiros.
+ 📝 Resumo do Projeto:
+"É um sistema de delivery construído com Arquitetura Limpa, onde a segurança do negócio é garantida pelo State Pattern e a flexibilidade pelo Strategy Pattern, tudo organizado sob os princípios do DDD."
 
-Documento: Valida e protege a identidade (CPF) do cliente.
+Status: Não usei um simples campo de Status (PickList/String), Porque "Usei o State Pattern para que as regras de transição fiquem protegidas dentro de objetos, impedindo que um pedido pule etapas ilegalmente". Explicação:
 
-Endereço: Estrutura de dados imutável para localização.
+Transição: Ele controla para onde o pedido pode ir. O EstadoCarrinho permite ir para EstadoEmProcessamento, mas o EstadoCancelado não permite ir para lugar nenhum.
 
-2. Pedido como Aggregate Root
-O Pedido atua como a raiz do agregado, protegendo a integridade de todos os ItemPedido:
+Bloqueio: Se você tentar uma ação proibida para aquele status, o objeto de estado lança a BusinessException que você configurou.
 
-Encapsulamento: Itens não podem ser alterados fora do Pedido.
+Manutenção: Com essa estrutura, se o negócio mudar, não precisa caçar ifs espalhados pelo código: apenas mexe na classe específica da regra (ex: FreteFixo ou EstadoCarrinho).
 
-Invariantes: O Pedido impede estados inválidos, como quantidades negativas ou duplicidade de produtos.
+Exceções de Negócio: A classe "BusinessException" não é um erro de sistema (bug), mas sim uma trava de segurança que comunica ao usuário que uma regra de negócio foi violada.
 
-3. Design Patterns Aplicados
-Strategy Pattern: O cálculo de preços é delegado para a interface PoliticaDePreco, permitindo novos tipos de desconto sem alterar o código existente (Open/Closed Principle).
-
-State Pattern: O ciclo de vida do pedido é controlado por classes de estado (EstadoCarrinho, EstadoEmProcessamento, etc.), eliminando ifs complexos e protegendo transições de status.
-
-
- Como Executar os Testes
-Para validar a robustez do sistema, utilize o script de execução anônima abaixo. Note que o sistema lançará exceções caso regras de negócio (Invariantes) sejam violadas:
-
-APEX
-// Exemplo de teste de fluxo completo e proteção de estado
-Pedido ped = new Pedido(ana);
-ped.adicionarProduto(pizza, 1); 
-ped.confirmar(); // Transiciona para EM_PROCESSAMENTO
-
-try {
-    ped.adicionarProduto(refri, 1); // Bloqueado pelo State Pattern
-} catch (Exception e) {
-    System.debug('Bloqueio de Segurança: ' + e.getMessage()); 
-}
-
-Conclusão Técnica
+📚 Conclusão Técnica
 Este projeto prova a aplicação prática do Open/Closed Principle e do Dependency Inversion, resultando em um código modular, testável e pronto para o crescimento do negócio.

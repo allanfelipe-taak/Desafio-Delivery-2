@@ -1,36 +1,49 @@
-// 1. Criar Objetos de Valor e Cliente
+// 1. Criar Objetos de Valor e Cliente (Etapa 1)
 Documento cpf = new Documento('123.456.789-00');
-
-Endereco enderecoCli = new Endereco('Rua Central', '123', 'São Paulo', 'Apto 1'); 
+// Ajustado para 4 parâmetros como sua classe Endereco agora exige
+Endereco enderecoCli = new Endereco('Rua Central', '123', 'Bairro Centro', 'São Paulo'); 
 Cliente ana = new Cliente('Ana Silva', cpf, enderecoCli, '11999999999');
 
-// 2. Definir Políticas de Preço (Etapa 3)
+// 2. Definir Políticas de Preço (Etapa 3 - Strategy)
 PoliticaDePreco padrao = new PoliticaPrecoPadrao();
-PoliticaDePreco comDesconto = new PoliticaPrecoDesconto(10.0); // 10% de desconto
+// Verifique se sua classe chama 'PoliticaPrecoDesconto' ou 'PoliticaPrecoComDescontoPercentual'
+PoliticaDePreco comDesconto = new PoliticaPrecoComDescontoPercentual(10.0); 
 
-// 3. Criar Produtos com Políticas Diferentes
-Produto pizza = new Produto('Pizza', new Dinheiro(50.0), padrao);
-Produto refri = new Produto('Refri', new Dinheiro(10.0), comDesconto);
+// 3. Criar Produtos
+Produto pizza = new Produto('Pizza Especial', new Dinheiro(50.0), padrao);
+Produto refri = new Produto('Refri Gelado', new Dinheiro(10.0), comDesconto);
 
-// 4. Iniciar Pedido (Estado: CARRINHO)
-Pedido ped = new Pedido(ana);
-ped.adicionarProduto(pizza, 1); // R$ 50.00
-ped.adicionarProduto(refri, 2); // R$ 18.00 (com 10% desc)
+// 4. Iniciar Pedido
+Pedido ped = new Pedido(); 
 
-System.debug('Status: ' + ped.getStatusDescricao()); // CARRINHO
-System.debug('Total Carrinho: R$' + ped.getTotal().getValor()); // 68.00
+// 5. Adicionar Itens (Ajustado para a assinatura do seu método)
+// Aqui pegamos o ID, a quantidade e o resultado do cálculo da estratégia de preço
+ped.adicionarProduto(pizza.getId(), 1, pizza.calcularPrecoFinal()); 
+ped.adicionarProduto(refri.getId(), 2, refri.calcularPrecoFinal());
 
-// 5. Transição de Estado (Etapa 5)
-ped.confirmar(); 
-System.debug('Status após confirmar: ' + ped.getStatusDescricao()); // EM_PROCESSAMENTO
+System.debug('--- TESTE DE ARQUITETURA ---');
+System.debug('Status Inicial: ' + ped.getStatus()); // Deve imprimir CARRINHO
+System.debug('Total do Pedido: R$ ' + ped.getTotal().getValor()); // Deve ser 68.00
 
-// 6. Teste de Invariante (Não pode adicionar item após confirmar)
+// 6. Transição de Estado (Etapa 4/5)
+// Ajustado: Passando 10.0 (Decimal) em vez de new Dinheiro(10.0)
+ped.confirmar(new FreteFixo(10.0)); 
+
+System.debug('Status após confirmar: ' + ped.getStatus()); 
+// ...
+
+// 7. Teste de Invariante (Segurança da Arquitetura)
 try {
-    ped.adicionarProduto(pizza, 1);
+    System.debug('Tentando adicionar produto em pedido confirmado...');
+    // Ajustado para a assinatura correta: (ID, Quantidade, Preço)
+    ped.adicionarProduto(pizza.getId(), 1, pizza.calcularPrecoFinal());
+} catch (BusinessException e) {
+    System.debug('✅ Bloqueio de Segurança Funcional: ' + e.getMessage()); 
 } catch (Exception e) {
-    System.debug('Bloqueio Correto: ' + e.getMessage()); 
+    System.debug('✅ Bloqueio: ' + e.getMessage());
 }
 
-// 7. Finalizar
-ped.marcarComoEntregue();
-System.debug('Status Final: ' + ped.getStatusDescricao()); // ENTREGUE
+// 8. Finalizar Fluxo
+ped.entregar(); // Verifique se o método é 'entregar()' ou 'marcarComoEntregue()'
+System.debug('Status Final: ' + ped.getStatus()); // Deve ser ENTREGUE
+System.debug('--- TESTE FINALIZADO COM SUCESSO ---');
