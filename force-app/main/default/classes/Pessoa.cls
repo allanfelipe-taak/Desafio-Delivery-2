@@ -1,10 +1,10 @@
+// Pessoa (Abstrata)
 public abstract class Pessoa extends EntidadeBase {
     private String nome;
     private final Documento documento;
 
-    public Pessoa(String nome, Documento documento) {
-        super();
-        if (String.isBlank(nome)) throw new IllegalArgumentException('Nome inválido');
+    protected Pessoa(String nome, Documento documento) {
+        if (String.isBlank(nome)) throw new IllegalArgumentException('Nome obrigatório');
         this.nome = nome;
         this.documento = documento;
     }

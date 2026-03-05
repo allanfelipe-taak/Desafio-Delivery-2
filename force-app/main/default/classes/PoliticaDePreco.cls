@@ -1,3 +1,3 @@
 public interface PoliticaDePreco {
-    Dinheiro calcularPreco (Produto produto);
+    Dinheiro calcularPreco(Produto produto);
 }

@@ -1,19 +1,20 @@
 public class EstadoCarrinho extends EstadoPedido {
-    public override void adicionarProduto(Pedido p, Produto prod, Integer qtd) {
-        p.adicionarItemInterno(prod, qtd);
+    public override String getNome() { 
+        return 'CARRINHO'; 
     }
-    public override void removerProduto(Pedido p, Produto prod) {
-        p.removerItemInterno(prod);
+
+    public override void adicionarProduto(Pedido pedido, String produtoId, Integer qtd, Dinheiro preco) {
+        pedido.executarAdicao(produtoId, qtd, preco);
     }
-    public override void confirmar(Pedido p) {
-        if (p.getItens().isEmpty()) throw new IllegalArgumentException('Carrinho vazio');
-        p.setEstado(new EstadoEmProcessamento());
+
+    public override void confirmar(Pedido pedido, PoliticaDeFrete frete) {
+        // Agora delegamos a lógica de confirmação para o estado
+        Dinheiro valorFrete = frete.calcularFrete(pedido);
+        pedido.aplicarFrete(valorFrete);
+        pedido.setEstado(new EstadoEmProcessamento());
     }
-    public override void cancelar(Pedido p) {
-        p.setEstado(new EstadoCancelado());
+
+    public override void cancelar(Pedido pedido) {
+        pedido.setEstado(new EstadoCancelado());
     }
-    public override void marcarComoEntregue(Pedido p) {
-        throw new IllegalArgumentException('Não pode entregar um pedido em carrinho');
-    }
-    public override String getDescricao() { return 'CARRINHO'; }
 }

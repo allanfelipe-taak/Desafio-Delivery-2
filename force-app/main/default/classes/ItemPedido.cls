@@ -1,21 +1,27 @@
 public class ItemPedido {
-    private Produto produto;
+    private String produtoId;
     private Integer quantidade;
+    private Dinheiro precoUnitario;
     private Dinheiro subtotal;
 
-    public ItemPedido(Produto produto, Integer quantidade) {
-        this.produto = produto;
-        this.quantidade = quantidade;
-        // Agora chamamos o cálculo polimórfico
-        this.subtotal = produto.calcularPrecoFinal().multiplicar(quantidade);
+    public ItemPedido(String produtoId, Integer quantidade, Dinheiro precoUnitario) {
+        this.produtoId = produtoId;
+        this.precoUnitario = precoUnitario;
+        setQuantidade(quantidade); // Isso já calcula o subtotal
     }
 
-    public void atualizarQuantidade(Integer novaQtd) {
-        this.quantidade = novaQtd;
-        this.subtotal = this.produto.calcularPrecoFinal().multiplicar(this.quantidade);
+    private void calcularSubtotal() {
+        // Corrigido: o método multiplicar recebe a quantidade
+        this.subtotal = this.precoUnitario.multiplicar(this.quantidade); 
     }
 
-    public Produto getProduto() { return this.produto; }
-    public Integer getQuantidade() { return this.quantidade; }
-    public Dinheiro getSubtotal() { return this.subtotal; }
+    public void setQuantidade(Integer novaQuantidade) {
+        if (novaQuantidade <= 0) throw new BusinessException('Quantidade deve ser positiva');
+        this.quantidade = novaQuantidade;
+        calcularSubtotal();
+    }
+
+    public String getProdutoId() { return produtoId; }
+    public Integer getQuantidade() { return quantidade; }
+    public Dinheiro getSubtotal() { return subtotal; }
 }

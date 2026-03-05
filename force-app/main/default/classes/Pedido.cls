@@ -1,82 +1,68 @@
 public class Pedido extends EntidadeBase {
-    private Cliente cliente;
-    private List<ItemPedido> itens;
-    private EstadoPedido estado; // State Pattern (Etapa 5)
+    private EstadoPedido estadoAtual; 
+    private Map<String, ItemPedido> itens;
     private Dinheiro total;
-    private Dinheiro frete;
+    private Dinheiro valorFrete;
 
-    public Pedido(Cliente cliente) {
+    public Pedido() {
         super();
-        this.cliente = cliente;
-        this.itens = new List<ItemPedido>();
-        this.estado = new EstadoCarrinho(); // Estado Inicial
-        this.total = new Dinheiro(0);
-        this.frete = new Dinheiro(0);
+        this.itens = new Map<String, ItemPedido>();
+        this.total = new Dinheiro(0.00);
+        this.estadoAtual = new EstadoCarrinho(); // Começa no Carrinho
     }
 
-    // Delegação de comportamento para o Estado (Etapa 5)
-    public void adicionarProduto(Produto produto, Integer quantidade) {
-        this.estado.adicionarProduto(this, produto, quantidade);
-        recalcularTotal();
+    // --- DELEGAÇÕES (O Pedido apenas repassa para o estado) ---
+    
+    public void adicionarProduto(String produtoId, Integer qtd, Dinheiro preco) {
+        estadoAtual.adicionarProduto(this, produtoId, qtd, preco);
     }
 
-    public void removerProduto(Produto produto) {
-        this.estado.removerProduto(this, produto);
-        recalcularTotal();
-    }
-
-    public void confirmar() {
-        this.estado.confirmar(this);
+    public void confirmar(PoliticaDeFrete frete) {
+        estadoAtual.confirmar(this, frete);
     }
 
     public void cancelar() {
-        this.estado.cancelar(this);
+        estadoAtual.cancelar(this);
     }
 
-    public void marcarComoEntregue() {
-        this.estado.marcarComoEntregue(this);
+    public void entregar() {
+        estadoAtual.entregar(this);
     }
 
-    // Métodos internos para o Agregado e Estados
-    public void adicionarItemInterno(Produto produto, Integer quantidade) {
-        for (ItemPedido item : itens) {
-            if (item.getProduto().getNome().equalsIgnoreCase(produto.getNome())) {
-                item.atualizarQuantidade(item.getQuantidade() + quantidade);
-                return;
-            }
+    // --- MÉTODOS DE ESTADO (Chamados pelos objetos de Estado) ---
+
+    public void setEstado(EstadoPedido novoEstado) {
+        this.estadoAtual = novoEstado;
+    }
+
+    public void executarAdicao(String produtoId, Integer qtd, Dinheiro preco) {
+        if (itens.containsKey(produtoId)) {
+            itens.get(produtoId).setQuantidade(itens.get(produtoId).getQuantidade() + qtd);
+        } else {
+            itens.put(produtoId, new ItemPedido(produtoId, qtd, preco));
         }
-        this.itens.add(new ItemPedido(produto, quantidade));
-    }
-
-    public void removerItemInterno(Produto produto) {
-        for (Integer i = 0; i < itens.size(); i++) {
-            if (itens[i].getProduto().getNome().equalsIgnoreCase(produto.getNome())) {
-                itens.remove(i);
-                break;
-            }
-        }
+        recalcularTotal(); 
     }
 
     public void recalcularTotal() {
-        Dinheiro somaItens = new Dinheiro(0);
-        for (ItemPedido item : itens) {
-            somaItens = somaItens.somar(item.getSubtotal());
+        Dinheiro novoTotal = new Dinheiro(0.00);
+        for (ItemPedido item : itens.values()) {
+            novoTotal = novoTotal.somar(item.getSubtotal());
         }
-        this.total = somaItens.somar(this.frete);
+        this.total = novoTotal;
     }
 
-    // Setters controlados para transição de estado
-    public void setEstado(EstadoPedido novoEstado) {
-        this.estado = novoEstado;
+    public void aplicarFrete(Dinheiro frete) {
+        this.valorFrete = frete;
+        this.total = this.total.somar(frete);
     }
 
-    public void setFrete(Dinheiro valorFrete) {
-        this.frete = valorFrete;
-        recalcularTotal();
+    // --- GETTERS ---
+
+    public String getStatus() { 
+        return estadoAtual.getNome(); 
     }
 
-    // Getters
-    public List<ItemPedido> getItens() { return new List<ItemPedido>(this.itens); }
-    public Dinheiro getTotal() { return this.total; }
-    public String getStatusDescricao() { return this.estado.getDescricao(); }
+    public List<ItemPedido> getItens() { return itens.values(); }
+    public Dinheiro getTotal() { return total; }
 }

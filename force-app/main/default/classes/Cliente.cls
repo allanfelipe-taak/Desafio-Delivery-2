@@ -1,4 +1,4 @@
-public class Cliente extends Pessoa{
+public class Cliente extends Pessoa {
     private Endereco endereco;
     private String telefone;
 
@@ -8,7 +8,10 @@ public class Cliente extends Pessoa{
         this.telefone = telefone;
     }
 
-    public override String getTipoPessoa() { return 'Cliente'; }
+    public override String getTipoPessoa() {
+        return 'CLIENTE';
+    }
+
     public Endereco getEndereco() { return endereco; }
-    
+    public String getTelefone() { return telefone; }
 }

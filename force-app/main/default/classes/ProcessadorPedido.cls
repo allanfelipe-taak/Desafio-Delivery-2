@@ -1,6 +1,10 @@
 public class ProcessadorPedido {
-    public void confirmar(Pedido p, PoliticaDeFrete frete) {
-        if (p.getItens().isEmpty()) throw new IllegalArgumentException('Pedido vazio');
-        // Lógica de confirmação e aplicação de frete
+    public void confirmar(Pedido pedido, PoliticaDeFrete frete) {
+        // Agora o pedido sabe se pode confirmar baseado no seu estado
+        pedido.confirmar(frete); 
+    }
+
+    public void cancelar(Pedido pedido) {
+        pedido.cancelar();
     }
 }

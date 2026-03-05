@@ -1,7 +1,7 @@
 Arquitetura de Domínio 
 Este projeto demonstra a evolução de um sistema de delivery simples para uma arquitetura robusta baseada em Domain-Driven Design (DDD) e Design Patterns avançados em Apex (Salesforce).
 
-Etapa 1: Modelagem Rica (VOs e EntidadeBase).
+Etapa 1: Modelagem Rica (EntidadeBase).
 
 Etapa 2: Aggregate Root (Pedido protege Itens).
 

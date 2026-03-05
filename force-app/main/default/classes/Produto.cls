@@ -1,19 +1,19 @@
 public class Produto extends EntidadeBase {
     private String nome;
     private Dinheiro precoBase;
-    private PoliticaDePreco politica; // COMPOSIÇÃO
+    private PoliticaDePreco politica;
 
+    // O construtor PRECISA aceitar esses 3 parâmetros exatamente nesta ordem
     public Produto(String nome, Dinheiro precoBase, PoliticaDePreco politica) {
-        super();
+        super(); // Gera o ID na EntidadeBase
         this.nome = nome;
         this.precoBase = precoBase;
         this.politica = politica;
     }
 
     public Dinheiro calcularPrecoFinal() {
-        return politica.calcularPreco(this);
+        return this.politica.calcularPreco(this);
     }
-    
-    public Dinheiro getPrecoBase() { return precoBase; }
-    public String getNome() { return nome; }
+
+    public Dinheiro getPrecoBase() { return this.precoBase; }
 }
