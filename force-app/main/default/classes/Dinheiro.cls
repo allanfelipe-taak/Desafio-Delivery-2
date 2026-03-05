@@ -13,7 +13,7 @@ public class Dinheiro {
         return new Dinheiro(this.valor + outro.getValor());
     }
 
-    // Certifique-se de que este método existe exatamente assim:
+    
     public Dinheiro multiplicar(Integer qtd) {
         return new Dinheiro(this.valor * qtd);
     }

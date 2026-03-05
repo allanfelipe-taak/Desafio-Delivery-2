@@ -11,7 +11,7 @@ public class ItemPedido {
     }
 
     private void calcularSubtotal() {
-        // Corrigido: o método multiplicar recebe a quantidade
+     
         this.subtotal = this.precoUnitario.multiplicar(this.quantidade); 
     }
 

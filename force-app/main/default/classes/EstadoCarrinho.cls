@@ -8,7 +8,7 @@ public class EstadoCarrinho extends EstadoPedido {
     }
 
     public override void confirmar(Pedido pedido, PoliticaDeFrete frete) {
-        // Agora delegamos a lógica de confirmação para o estado
+        //  lógica de confirmação para o estado
         Dinheiro valorFrete = frete.calcularFrete(pedido);
         pedido.aplicarFrete(valorFrete);
         pedido.setEstado(new EstadoEmProcessamento());
