@@ -46,13 +46,11 @@ Conceito Aplicado: Domain Service (Orquestração de frete).
 
  Conceito Aplicado: State Pattern (Ciclo de vida inteligente). 
  
- 
- Resumo para apresentação:ConceitoOnde encontrar no seu projeto?DDDNo uso de Aggregate Root (Pedido) e Value Objects (Dinheiro).SOLIDNo uso de interfaces e na separação total de responsabilidades por arquivo.Design PatternsNo Strategy (Fretes/Preços) e no State (Ciclo de vida do Pedido).Clean CodeNo uso da BusinessException para tratar erros de forma elegante.
 
- 📝 Resumo do Projeto:
+  Resumo do Projeto:
 "É um sistema de delivery construído com Arquitetura Limpa, onde a segurança do negócio é garantida pelo State Pattern e a flexibilidade pelo Strategy Pattern, tudo organizado sob os princípios do DDD."
 
-Status: Não usei um simples campo de Status (PickList/String), Porque "Usei o State Pattern para que as regras de transição fiquem protegidas dentro de objetos, impedindo que um pedido pule etapas ilegalmente". Explicação:
+Status: Não usei um simples campo de Status (PickList/String), Porque "Usei o State Pattern que pede na Etapa 5 pra eliminar os Enums para que as regras de transição fiquem protegidas dentro de objetos, impedindo que um pedido pule etapas ilegalmente". Explicação:
 
 Transição: Ele controla para onde o pedido pode ir. O EstadoCarrinho permite ir para EstadoEmProcessamento, mas o EstadoCancelado não permite ir para lugar nenhum.
 
@@ -74,11 +72,11 @@ Para garantir que a arquitetura respeita as regras de negócio, o projeto foi va
 
 1. Testes Unitários (`@isTest`)
 A classe `PedidoTest.cls` garante a cobertura lógica e a integridade dos contratos.
-* **Caminho Feliz:** Valida a criação, adição de itens com Strategy e fluxo de estados até a entrega.
-* **Caminho de Exceção:** Valida se a `BusinessException` é lançada ao tentar violar uma regra de estado (ex: adicionar item após confirmação).
+Caminho" Valida a criação, adição de itens com Strategy e fluxo de estados até a entrega.
+Caminho de Exceção: Valida se a `BusinessException` é lançada ao tentar violar uma regra de estado (ex: adicionar item após confirmação).
 
 2. Script de Execução (Anonymous Apex)
-O script abaixo pode ser usado para simular uma jornada real de compra no Console do Salesforce:
+O script abaixo pode ser usado para simular uma jornada real de compra no Console do Salesforce vc encontra essa parte do codigo seguindo as pastas apex > helo.apex e logo em seguida Execute Anonymous Apex.
 
 // 1. Criar Objetos de Valor e Cliente (Etapa 1)
 Documento cpf = new Documento('123.456.789-00');
