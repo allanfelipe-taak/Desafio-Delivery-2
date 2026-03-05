@@ -1,4 +1,4 @@
-🚀 Arquitetura de Domínio 
+Arquitetura de Domínio 
 
 Este projeto demonstra a evolução de um sistema de delivery simples para uma arquitetura robusta baseada em Domain-Driven Design (DDD) e Design Patterns avançados em Apex (Salesforce).
 
@@ -12,39 +12,33 @@ Etapa 4: Domain Service (ProcessadorPedido e Frete).
 
 Etapa 5: State Pattern (Ciclo de vida sem Enums).
 
+Este repositório registra como transformei um sistema de delivery comum em uma estrutura profissional, aplicando DDD e Design Patterns para resolver problemas reais de código.
+
 Etapas da Arquitetura
 
-✅  Etapa 1: O Coração do Domínio (DDD e Value Objects)Arquivos: EntidadeBase.cls, Dinheiro.cls, EntidadeBase.cls.  
+ Etapa 1: Blindando os dados (Dinheiro e Endereço)
+Nesta fase, parei de usar Decimal e String para tudo. Criei a classe Dinheiro para garantir que nenhum valor nasça negativo no sistema. Também usei a EntidadeBase para dar uma identidade única (ID) a cada objeto, garantindo que um Pedido seja único do começo ao fim.
 
-Conceito DDD: Introdução de Value Objects (Objetos de Valor). O Dinheiro não é apenas um número; ele é um objeto que garante que o valor nunca seja negativo.SOLID (S - Single Responsibility): A classe Dinheiro tem apenas uma responsabilidade: cuidar da lógica matemática monetária.
+O que aprendi: Dados importantes não podem ser apenas números; eles precisam de regras próprias (Value Objects).
 
-Conceito Aplicado: Identidade (na base) e Value Object (no Dinheiro).
+ Etapa 2: O Pedido como "Chefe" (Aggregate Root)
+Aqui apliquei o conceito de Agregado. O Pedido.cls passou a controlar totalmente seus itens. Ninguém de fora consegue mexer em um ItemPedido sem passar pelo Pedido, o que protege o cálculo do valor total.
 
-✅ Etapa 2: Integridade e Agregados (DDD)Arquivos: Pedido.cls, ItemPedido.cls. 
+O que aprendi: Encapsulamento real é quando o objeto principal protege a integridade dos seus dados internos.
 
-Conceito DDD: Aggregate Root (Raiz de Agregado). O Pedido é o "chefe" do grupo. Você não pode alterar um ItemPedido sem passar pelo Pedido.SOLID (Encapsulamento): Protegemos a lista de itens e o total, garantindo que ninguém de fora quebre as regras de cálculo do pedido.
+Etapa 3: Preços que mudam sem quebrar o código (Strategy)
+Em vez de encher a classe Produto de if/else para dar descontos, usei o Strategy Pattern. Agora, se eu quiser criar um "Desconto de Natal", só crio uma classe nova sem tocar no código que já está rodando (respeitando o princípio Open/Closed).
 
-Conceito Aplicado: Aggregate Root (O Pedido controla os Itens).
+ Etapa 4: Organizando o Frete (Domain Service)
+Criei o ProcessadorPedido para cuidar da parte "burocrática". Ele usa o frete (como o FreteFixo) para finalizar o pedido. Usei interfaces aqui para que o sistema não dependa de um frete específico, facilitando a troca no futuro.
 
-✅  Etapa 3: Flexibilidade de Regras (Strategy Pattern)Arquivos: PoliticaDePreco.cls, PoliticaPrecoPadrao.cls, PoliticaPrecoComDescontoPercentual.cls.
-
-Conceito: Design Pattern: Strategy Pattern. Criamos uma "estratégia" para calcular o preço.SOLID (O - Open/Closed): O sistema está Aberto para novos descontos, mas Fechado para modificação no Produto.cls. Você adiciona regras sem mexer no que já funciona.
-
-Conceito Aplicado: Strategy Pattern (Flexibilidade de preços).
-
-
-✅ Etapa 4: Orquestração de Processos (Domain Service)Arquivos: ProcessadorPedido.cls, PoliticaDeFrete.cls, FreteFixo.cls, BusinessException.cls.
-
-Conceito DDD: Domain Service. O ProcessadorPedido não é um objeto físico, é um serviço que orquestra o frete e a confirmação.SOLID (D - Dependency Inversion): O processador depende da interface PoliticaDeFrete, e não de uma classe específica. Isso permite trocar o tipo de frete facilmente.
-
-Conceito Aplicado: Domain Service (Orquestração de frete).
+Etapa 5: Inteligência de Status (State Pattern)
+O maior desafio foi aqui: eliminei os Enums de status. Agora, o status do pedido é um objeto (ex: EstadoCarrinho). Isso impede que o pedido "pule" etapas ilegalmente. Se alguém tentar entregar um pedido que ainda está no carrinho, o próprio objeto de estado barra a ação e lança a minha BusinessException. O comportamento do o Pedido não sabe quais são as regras de transição. Ele apenas pergunta ao objeto estadoAtual se a ação é permitida. Isso é o Desacoplamento em sua forma mais pura. Agora depende do estado.SOLID (L - Liskov Substitution): Qualquer classe de estado (ex: EstadoEntregue) pode substituir a classe pai (EstadoPedido) sem quebrar o sistema.SOLID (I - Interface Segregation): Cada estado implementa apenas o que lhe é permitido, lançando exceções para o que é proibido.
 
 
- ✅ Etapa 5: Ciclo de Vida Inteligente (State Pattern)Arquivos: EstadoPedido.cls, EstadoCarrinho.cls, EstadoEmProcessamento.cls, EstadoEntregue.cls, EstadoCancelado.cls.
+Por que fiz isso? Para tirar a complexidade de validação de dentro do Pedido e deixar o ciclo de vida do software muito mais seguro e fácil de manter.
+
  
- Conceito? Design Pattern: State Pattern. O comportamento do o Pedido não sabe quais são as regras de transição. Ele apenas pergunta ao objeto estadoAtual se a ação é permitida. Isso é o Desacoplamento em sua forma mais pura. Agora depende do estado.SOLID (L - Liskov Substitution): Qualquer classe de estado (ex: EstadoEntregue) pode substituir a classe pai (EstadoPedido) sem quebrar o sistema.SOLID (I - Interface Segregation): Cada estado implementa apenas o que lhe é permitido, lançando exceções para o que é proibido.
-
- Conceito Aplicado: State Pattern (Ciclo de vida inteligente). 
  
 
   Resumo do Projeto:
@@ -59,6 +53,9 @@ Bloqueio: Se você tentar uma ação proibida para aquele status, o objeto de es
 Manutenção: Com essa estrutura, se o negócio mudar, não precisa caçar ifs espalhados pelo código: apenas mexe na classe específica da regra (ex: FreteFixo ou EstadoCarrinho).
 
 Exceções de Negócio: A classe "BusinessException" não é um erro de sistema (bug), mas sim uma trava de segurança que comunica ao usuário que uma regra de negócio foi violada.
+
+
+
 
 📚 Conclusão Técnica
 Este projeto prova a aplicação prática do Open/Closed Principle e do Dependency Inversion, resultando em um código modular, testável e pronto para o crescimento do negócio.
