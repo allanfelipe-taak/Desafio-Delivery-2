@@ -57,13 +57,13 @@ Exceções de Negócio: A classe "BusinessException" não é um erro de sistema 
 
 
 
-📚 Conclusão Técnica
-Este projeto prova a aplicação prática do Open/Closed Principle e do Dependency Inversion, resultando em um código modular, testável e pronto para o crescimento do negócio.
+Conclusão Técnica
+Este projeto está pronto para Validação e Testes seguindo o roteiro abaixo:
 
 
-OBS: Validação e Testes
 
-🧪 Validação e Testes
+
+Validação e Testes
 
 Para garantir que a arquitetura respeita as regras de negócio, o projeto foi validado de duas formas:
 
